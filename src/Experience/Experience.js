@@ -15,14 +15,14 @@ export default class Experience {
     if (instance) return instance;
     instance = this;
     //global
-    window.Experience = this;
+    window.experience = this;
 
     //options
     this.canvas = canvas;
 
     //setup
     this.debug = new Debug();
-    this.Sizes = new Sizes();
+    this.sizes = new Sizes();
     this.time = new Time();
     this.scene = new THREE.Scene();
     this.resources = new Resources(sources);
@@ -31,7 +31,7 @@ export default class Experience {
     this.world = new World();
 
     //sizes resize event
-    this.Sizes.on("resize", () => {
+    this.sizes.on("resize", () => {
       this.resize();
     });
 
@@ -50,5 +50,33 @@ export default class Experience {
     this.camera.update();
     this.world.update();
     this.renderer.update();
+  }
+
+  destroy() {
+    this.sizes.off("resize");
+    this.time.off("tick");
+
+    // Traverse the whole scene
+    this.scene.traverse((child) => {
+      // Test if it's a mesh
+      if (child instanceof THREE.Mesh) {
+        child.geometry.dispose();
+
+        // Loop through the material properties
+        for (const key in child.material) {
+          const value = child.material[key];
+
+          // Test if there is a dispose function
+          if (value && typeof value.dispose === "function") {
+            value.dispose();
+          }
+        }
+      }
+    });
+
+    this.camera.controls.dispose();
+    this.renderer.instance.dispose();
+
+    if (this.debug.active) this.debug.ui.destroy();
   }
 }
