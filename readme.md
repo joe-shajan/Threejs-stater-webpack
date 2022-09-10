@@ -1,4 +1,4 @@
-Threejs code structure for bigger projects
+#Threejs code structure for bigger projects
 
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).
